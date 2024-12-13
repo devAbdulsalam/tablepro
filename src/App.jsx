@@ -5,6 +5,7 @@ import AddContentModal from './components/AddContentModal.jsx';
 import DeleteContentModal from './components/DeleteModal.jsx';
 import FileNameModal from './components/FileNameModal.jsx';
 import { FaPlus } from 'react-icons/fa6';
+// import { AiTwotoneEdit } from 'react-icons/ai';
 import {
 	Document,
 	Packer,
@@ -22,6 +23,7 @@ function App() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isModal, setIsModal] = useState(false);
 	const [isFileModal, setIsFileModal] = useState(false);
+	// const [isTitleModal, setIsTitleModal] = useState(false);
 	const [isEdit, setIsEdit] = useState(null);
 	const [isDelete, setIsDelete] = useState(null);
 	const [fileName, setFileName] = useState('');
@@ -111,7 +113,10 @@ function App() {
 
 	return (
 		<main className="relative h-screen px-8 py-8 bg-slate-100">
-			<h1 className="text-3xl font-bold text-center my-4">Table Data</h1>
+			<h1 className="text-3xl font-bold text-center my-4">
+				Table Data
+				{/* <AiTwotoneEdit onClick={() => setIsTitleModal(true)} />				 */}
+			</h1>
 			<div className="bg-white rounded-sm my-4">
 				<TableContent
 					tableRef={tableRef}
@@ -162,6 +167,15 @@ function App() {
 				setName={setFileName}
 				handleDownLoad={downloadDocx}
 			/>
+			{/* <FileTitleModal
+				show={isFileModal}
+				setShow={setIsFileModal}
+				setLoading={setIsLoading}
+				loading={isLoading}
+				name={fileName}
+				setName={setFileName}
+				handleDownLoad={downloadDocx}
+			/> */}
 		</main>
 	);
 }
