@@ -21,7 +21,7 @@ const DeleteContentModal = ({
 	};
 	return (
 		<Modal show={show}>
-			<div className="transform overflow-hidden rounded-xl bg-white text-left align-middle shadow-xl transition-all font-josefin min-w-[600px] max-w-2xl">
+			<div className="transform overflow-hidden rounded-xl bg-white text-left align-middle shadow-xl transition-all font-josefin min-w-[400px] max-w-2xl">
 				<div className="space-y-5 p-4">
 					<div className="flex justify-between">
 						<div>
@@ -42,7 +42,6 @@ const DeleteContentModal = ({
 						</p>
 					</div>
 					<button
-						disabled={loading}
 						className="bg-red-500 hover:bg-red-700 text-white font-semibold h-10 py-1 w-full flex items-center justify-center rounded-md transition-all duration-500 ease-in-out"
 						onClick={handleSubmit}
 					>
