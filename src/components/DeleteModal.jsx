@@ -19,6 +19,10 @@ const DeleteContentModal = ({
 		setShow(false);
 		return;
 	};
+	const handleClose = () => {
+		setLoading(false);
+		setShow(false);
+	};
 	return (
 		<Modal show={show}>
 			<div className="transform overflow-hidden rounded-xl bg-white text-left align-middle shadow-xl transition-all font-josefin min-w-[400px] max-w-2xl">
@@ -30,7 +34,7 @@ const DeleteContentModal = ({
 							</p>
 						</div>
 						<button
-							onClick={() => setShow(false)}
+							onClick={handleClose}
 							className="m-1 p-1 py-1 shadow rounded-full bg-red-200 hover:bg-red-300 duration-150 ease-in-out"
 						>
 							<HiXMark className="fa-solid fa-xmark text-xl text-red-600 hover:text-red-800" />
