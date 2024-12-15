@@ -22,7 +22,7 @@ function Table({ tableRef, tableData, handleDelete, handleEdit }) {
 					return (
 						<tr key={index}>
 							<td className="px-6 py-4 whitespace-nowrap  flex justify-center ">
-								{item.id || index + 1}
+								{index + 1}
 							</td>
 							<td className="px-6 py-4">{item.content}</td>
 							<td className="p-3 px-5 flex justify-end">
