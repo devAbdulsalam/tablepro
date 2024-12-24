@@ -3,15 +3,15 @@
 function Table({ tableRef, tableData, handleDelete, handleEdit }) {
 	return (
 		<table ref={tableRef} className="min-w-full divide-y divide-gray-200">
-			<thead>
-				<tr>
+			<thead className="">
+				<tr className="bg-white">
 					<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 						S/N
 					</th>
-					<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
+					<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 						Content
 					</th>
-					<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
+					<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 						Action
 					</th>
 				</tr>
@@ -25,7 +25,7 @@ function Table({ tableRef, tableData, handleDelete, handleEdit }) {
 								{index + 1}
 							</td>
 							<td className="px-6 py-4">{item.content}</td>
-							<td className="p-3 px-5 flex justify-end">
+							<td className="p-3 px-2 md:px-5 flex justify-end">
 								<button
 									type="button"
 									onClick={() => handleEdit(item)}
