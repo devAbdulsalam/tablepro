@@ -76,7 +76,9 @@ However, usually there are 3 elements in a corrupt act:
 				const result = await chatSession.sendMessage(prompt);
 				if (result?.response) {
 					const message = await result.response.JSON();
-					console.log('Fetched Questions:', message);
+					const messageJson = await result.response.Json();
+					console.log('Fetched message:', message);
+					console.log('Fetched messageJson:', messageJson);
 					setQuestions(Array.isArray(message) ? message : []);
 				} else {
 					console.error('Invalid result response:', result);
