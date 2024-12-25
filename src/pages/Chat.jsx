@@ -4,9 +4,9 @@ import {
 	// HarmCategory,
 	// HarmBlockThreshold,
 } from '@google/generative-ai';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 // import { GoogleAIFileManager } from '@google/generative-ai/server';
+import ChatInput from '../components/ChatInput';
+import ChatBody from '../components/ChatBody';
 
 const Chat = () => {
 	const [language, setLanguage] = useState(false);
@@ -46,14 +46,6 @@ const Chat = () => {
 			console.error('Speech Recognition API is not supported in this browser.');
 		}
 	};
-	const handleReadText = (message) => {
-		if ('speechSynthesis' in window) {
-			const utterance = new SpeechSynthesisUtterance(message);
-			window.speechSynthesis.speak(utterance);
-		} else {
-			console.error('Speech Synthesis is not supported in this browser.');
-		}
-	};
 
 	// const { user } = useContext(AuthContext);
 	// const name = user.user?.name;
@@ -74,24 +66,23 @@ const Chat = () => {
 
 	const handleGenerateContent = async () => {
 		try {
+			if (!text.trim()) return;
 			setChats((prev) => [...prev, { sender: 'me', message: text }]);
 			const chatSession = model.startChat({
 				generationConfig,
 				history: [],
 			});
 			const result = await chatSession.sendMessage(text);
-			console.log(result.response.text());
 			setText('');
 			const message = result.response.text();
 			setChats((prev) => [...prev, { sender: 'ai', message }]);
-			console.log('chats', chats);
 		} catch (error) {
 			console.error('Error generating content:', error);
 		}
 	};
 
 	return (
-		<main className="px-6 pt-2 space-y-1 relative">
+		<main className="p-1 md:px-6 pt-2 space-y-1 relative">
 			<div className="flex justify-between px-5 py-1  text-xl items-center bg-green-500 text-white w-full">
 				<div className="space-x-5 flex items-center">
 					<a href="./dashboard">
@@ -132,73 +123,17 @@ const Chat = () => {
 				</div>
 			</div>
 			{/* <!-- Main chat area --> */}
-			<div className="flex flex-col w-full md:w-3/4 mx-auto bg-white p-4 mt-2 min-h-[400px] md:min-h-[570px]">
+			<div className="flex flex-col w-full md:w-3/4 mx-auto bg-white md:p-4 mt-2 min-h-[400px] md:min-h-[570px]">
 				{/* <!-- Chat messages --> */}
-				<div className="flex-grow overflow-y-auto" id="chatContainer">
-					{/* <!-- Example chat message with play button --> */}
-					{chats.map((chat, index) => (
-						<div key={index}>
-							{chat.sender === 'ai' ? (
-								<div className="flex items-center mb-4">
-									<div className="bg-green-100 p-4 rounded-lg flex-grow">
-										{chat.message}
-									</div>
-									<button
-										onClick={() => handleReadText(chat.message)}
-										className="ml-2 p-2 bg-green-500 text-white rounded-full playBtn"
-									>
-										▶
-									</button>
-								</div>
-							) : (
-								<div className="flex items-center mb-4">
-									{/* <div className="bg-gray-100 p-4 ml-8 rounded-lg flex-grow">
-										{chat.message}
-										</div> */}
-									<div className="bg-gray-100 p-4 ml-8 rounded-lg flex-grow">
-										<Markdown remarkPlugins={[remarkGfm]}>
-											{chat.message}
-										</Markdown>
-									</div>
-									<button
-										onClick={() => handleReadText(chat.message)}
-										className="ml-2 p-2 bg-green-500 text-white rounded-full playBtn"
-									>
-										▶
-									</button>
-								</div>
-							)}
-						</div>
-					))}
-				</div>
 
+				<ChatBody chats={chats} />
 				{/* <!-- Input field and voice input button --> */}
-				<div className="flex items-center border-t pt-4">
-					<input
-						type="text"
-						id="chatInput"
-						value={text}
-						onChange={(e) => setText(e.target.value)}
-						placeholder="Enter to send..."
-						className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-					/>
-					{/* <!-- Voice input button --> */}
-					<button
-						id="voiceBtn"
-						onClick={handleVoiceInput}
-						className="ml-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-					>
-						🎤
-					</button>
-					<button
-						type="submit"
-						onClick={handleGenerateContent}
-						id="sendBtn"
-						className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-					>
-						Send
-					</button>
-				</div>
+				<ChatInput
+					handleGenerateContent={handleGenerateContent}
+					handleVoiceInput={handleVoiceInput}
+					setText={setText}
+					text={text}
+				/>
 			</div>
 		</main>
 	);

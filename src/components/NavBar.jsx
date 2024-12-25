@@ -5,12 +5,13 @@ function NavBar() {
 	const [navbar, setNavbar] = useState(false);
 
 	const links = [
-		{name: 'Home', href: '/'},
-		{name: 'Tweet', href: '/tweet'},
-		{name: 'Chat', href: '/chat'},
-		{name: 'Ms Word', href: '/ms-word'},
-		{name: 'Contact ', href: '/'},
-]
+		{ name: 'Home', href: '/' },
+		{ name: 'Home', href: '/home' },
+		{ name: 'Tweet', href: '/tweet' },
+		{ name: 'Chat', href: '/chat' },
+		{ name: 'Ms Word', href: '/ms-word' },
+		{ name: 'Contact ', href: '/' },
+	];
 
 	return (
 		<nav className="w-full bg-white shadow">
@@ -66,12 +67,12 @@ function NavBar() {
 					>
 						<ul className="items-center justify-center space-y-8 md:flex md:space-x-6 md:space-y-0">
 							{links.map((item, index) => {
-							<li className="text-gray-600 hover:text-blue-600">
-								<Link to={item.href}>{item.name}</Link>
-							</li>
-
+								return (
+									<li key={index} className="text-gray-600 hover:text-blue-600">
+										<Link to={item.href}>{item.name}</Link>
+									</li>
+								);
 							})}
-							
 						</ul>
 					</div>
 				</div>
