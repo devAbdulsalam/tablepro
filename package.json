@@ -12,6 +12,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "@headlessui/react": "^2.2.0",
+    "@mlc-ai/web-llm": "^0.2.77",
     "aos": "^2.3.4",
     "axios": "^1.7.9",
     "docx": "^9.1.0",

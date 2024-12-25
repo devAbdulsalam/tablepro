@@ -6,7 +6,7 @@ import {
 } from '@google/generative-ai';
 // import { GoogleAIFileManager } from '@google/generative-ai/server';
 import ChatInput from '../components/ChatInput';
-import ChatBody from '../components/ChatBody';
+import ChatBody from '../components/ChatBody'; // Import everything
 
 const Chat = () => {
 	const [language, setLanguage] = useState(false);
@@ -63,7 +63,8 @@ const Chat = () => {
 		maxOutputTokens: 1000,
 		responseMimeType: 'text/plain',
 	};
-
+	
+          
 	const handleGenerateContent = async () => {
 		try {
 			if (!text.trim()) return;
