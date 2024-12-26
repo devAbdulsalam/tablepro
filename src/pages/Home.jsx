@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoChatbubbleEllipsesOutline } from 'react-icons/io5';
 import { IoArrowBack } from 'react-icons/io5';
@@ -12,11 +12,12 @@ import {
 	// HarmCategory,
 	// HarmBlockThreshold,
 } from '@google/generative-ai';
+import { MenuItems } from '@headlessui/react';
 // infinity;
 
 function Home() {
 	const navigate = useNavigate();
-	const [questions, setQuestions] = [null];
+	const [questions, setQuestions] = useState(null);
 	const apiKey = import.meta.env.VITE_APP_GEMINI_API_KEY;
 	const genAI = new GoogleGenerativeAI(apiKey);
 	const model = genAI.getGenerativeModel({
@@ -75,11 +76,16 @@ However, usually there are 3 elements in a corrupt act:
 
 				const result = await chatSession.sendMessage(prompt);
 				if (result?.response) {
-					const message = await result.response.JSON();
-					const messageJson = await result.response.Json();
-					console.log('Fetched message:', message);
-					console.log('Fetched messageJson:', messageJson);
-					setQuestions(Array.isArray(message) ? message : []);
+					const rawMessage = await result.response.text();
+
+					// Preprocess the message to remove unwanted content like code block markers
+					const sanitizedMessage = rawMessage
+						.replace(/```json|```/g, '')
+						.trim();
+
+					const parsedMessage = JSON.parse(sanitizedMessage);
+					console.log('Parsed Questions:', parsedMessage);
+					setQuestions(() => parsedMessage);
 				} else {
 					console.error('Invalid result response:', result);
 					setQuestions([]);
@@ -92,6 +98,41 @@ However, usually there are 3 elements in a corrupt act:
 
 		generateQuestions();
 	}, [prompt]);
+
+	// useEffect(() => {
+	// 	const generateQuestions = async () => {
+	// 		try {
+	// 			const chatSession = model.startChat({
+	// 				generationConfig,
+	// 				history: [],
+	// 			});
+
+	// 			const result = await chatSession.sendMessage(prompt);
+	// 			if (result?.response) {
+	// 				const message = await result.response.text();
+	// 				try {
+	// 					const parsedMessage = JSON.parse(message);
+	// 					console.log('Fetched Message0:', message[0]);
+	// 					setQuestions(Array.isArray(parsedMessage) ? parsedMessage : []);
+	// 				} catch (jsonError) {
+	// 					console.error('Error parsing JSON message:', jsonError);
+	// 					setQuestions([]);
+	// 				}
+
+	// 				const parsedMessage = Array.isArray(message) ? message : [message];
+	// 				setQuestions(parsedMessage);
+	// 			}else {
+	// 				console.error('Invalid result response:', result);
+	// 				setQuestions([]);
+	// 			}
+	// 		} catch (error) {
+	// 			console.error('Error generating questions:', error);
+	// 			setQuestions([]);
+	// 		}
+	// 	};
+
+	// 	generateQuestions();
+	// }, [prompt]);
 
 	// useEffect(() => {
 	// 	const generateQuestions = async () => {
@@ -262,25 +303,34 @@ However, usually there are 3 elements in a corrupt act:
 				</div>
 				{questions?.length > 0 &&
 					questions?.map((item, index) => {
-						<div key={index} className="animate text-center flex-1 h-full ">
-							<div>
-								<h2 className="capitalize text-4xl md:text-6xl font-bold py-4 italic">
-									Question <br /> {index + 1}
-								</h2>
-								<h3 className="text-lg font-bold py-4 italic">
-									{item.question}
-								</h3>
+						return (
+							<div key={index} className="animate text-center flex-1 h-full ">
+								<div>
+									<h2 className="capitalize text-4xl md:text-6xl font-bold py-4 italic">
+										Question <br /> {index + 1}
+									</h2>
+									<h3 className="text-lg font-bold py-4 italic">
+										{item.question}
+									</h3>
+								</div>
+								{item?.options?.length > 0 &&
+									item.options.map((option, i) => {
+										return (
+											<button
+												key={i}
+												className={`border border-slate-500 my-2 hover:border-[#682B7E] hover:bg-[#682B7E] text-slate-800 hover:text-white font-semibold  py-3 p-1 w-full flex items-center justify-center rounded-md transition-all duration-500 ease-in-out ${
+													option.correct === true
+														? 'bg-[#682B7E] text-white'
+														: ''
+												}`}
+												// onClick={handleSubmit}
+											>
+												{option}
+											</button>
+										);
+									})}
 							</div>
-							<div className="text-left py-4">
-								<button
-									// disabled={loading}
-									className="border border-slate-500 my-2 hover:border-[#682B7E] hover:bg-[#682B7E] text-slate-800 hover:text-white font-semibold  py-3 p-1 w-full flex items-center justify-center rounded-md transition-all duration-500 ease-in-out"
-									// onClick={handleSubmit}
-								>
-									A: Learn about the effect corruptions and crime
-								</button>
-							</div>
-						</div>;
+						);
 					})}
 
 				<div className="h-fit">
