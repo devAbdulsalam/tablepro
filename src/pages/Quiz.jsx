@@ -202,7 +202,7 @@ However, usually there are 3 elements in a corrupt act:
 		<>
 			{/* <HomeLayout> */}
 			<main className="bg flex flex-col justify-center  w-full md:w-3/4 mx-auto bg-white md:pb-4 mt-2 min-h-[400px] md:min-h-screen h-auto p-1 relative">
-				<div className="h-fit w-full flex justify-between items-center mt-1">
+				<div className="h-fit w-full flex justify-between items-center debug">
 					<button
 						className=" hover:bg-gray-200 text-slate-800 text-2xl font-semibold  py-3 p-2 rounded-full transition-all duration-500 ease-in-out"
 						onClick={() => navigate('/chat')}
