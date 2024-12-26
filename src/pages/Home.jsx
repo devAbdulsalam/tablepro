@@ -7,12 +7,9 @@ import Button, { WhiteButton } from '../components/Button';
 import Points from '../components/Points';
 import AnimationContainer from '../components/AnimationContainer';
 import avatar from '../assets/avatar.png';
-import {
-	GoogleGenerativeAI,
-	// HarmCategory,
-	// HarmBlockThreshold,
-} from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { MenuItems } from '@headlessui/react';
+import ChatBot from '../components/ChatBot';
 // infinity;
 
 function Home() {
@@ -23,13 +20,47 @@ function Home() {
 	const model = genAI.getGenerativeModel({
 		model: 'gemini-1.5-flash',
 	});
+	const schema = {
+		description: 'List of quiz questions',
+		type: SchemaType.ARRAY,
+		items: {
+			type: SchemaType.OBJECT,
+			properties: {
+				numb: {
+					type: SchemaType.NUMBER,
+					description: 'The question number',
+					nullable: false,
+				},
+				question: {
+					type: SchemaType.STRING,
+					description: 'The quiz question text',
+					nullable: false,
+				},
+				answer: {
+					type: SchemaType.STRING,
+					description: 'The correct answer to the question',
+					nullable: false,
+				},
+				options: {
+					type: SchemaType.ARRAY,
+					description: 'The list of possible answers for the question',
+					items: {
+						type: SchemaType.STRING,
+					},
+					nullable: false,
+				},
+			},
+			required: ['numb', 'question', 'answer', 'options'],
+		},
+	};
 
 	const generationConfig = {
 		temperature: 1,
 		topP: 0.95,
 		topK: 64,
 		maxOutputTokens: 1000,
-		responseMimeType: 'text/plain',
+		responseMimeType: 'application/json',
+		responseSchema: schema,
 	};
 
 	const mode = 'easy';
@@ -77,13 +108,12 @@ However, usually there are 3 elements in a corrupt act:
 				const result = await chatSession.sendMessage(prompt);
 				if (result?.response) {
 					const rawMessage = await result.response.text();
-
 					// Preprocess the message to remove unwanted content like code block markers
-					const sanitizedMessage = rawMessage
-						.replace(/```json|```/g, '')
-						.trim();
+					// const sanitizedMessage = rawMessage
+					// 	.replace(/```json|```/g, '')
+					// 	.trim();
 
-					const parsedMessage = JSON.parse(sanitizedMessage);
+					const parsedMessage = JSON.parse(rawMessage);
 					console.log('Parsed Questions:', parsedMessage);
 					setQuestions(() => parsedMessage);
 				} else {
@@ -99,57 +129,6 @@ However, usually there are 3 elements in a corrupt act:
 		generateQuestions();
 	}, [prompt]);
 
-	// useEffect(() => {
-	// 	const generateQuestions = async () => {
-	// 		try {
-	// 			const chatSession = model.startChat({
-	// 				generationConfig,
-	// 				history: [],
-	// 			});
-
-	// 			const result = await chatSession.sendMessage(prompt);
-	// 			if (result?.response) {
-	// 				const message = await result.response.text();
-	// 				try {
-	// 					const parsedMessage = JSON.parse(message);
-	// 					console.log('Fetched Message0:', message[0]);
-	// 					setQuestions(Array.isArray(parsedMessage) ? parsedMessage : []);
-	// 				} catch (jsonError) {
-	// 					console.error('Error parsing JSON message:', jsonError);
-	// 					setQuestions([]);
-	// 				}
-
-	// 				const parsedMessage = Array.isArray(message) ? message : [message];
-	// 				setQuestions(parsedMessage);
-	// 			}else {
-	// 				console.error('Invalid result response:', result);
-	// 				setQuestions([]);
-	// 			}
-	// 		} catch (error) {
-	// 			console.error('Error generating questions:', error);
-	// 			setQuestions([]);
-	// 		}
-	// 	};
-
-	// 	generateQuestions();
-	// }, [prompt]);
-
-	// useEffect(() => {
-	// 	const generateQuestions = async () => {
-	// 		const chatSession = model.startChat({
-	// 			generationConfig,
-	// 			history: [],
-	// 		});
-	// 		const result = await chatSession.sendMessage(prompt);
-	// 		// if (result) {
-	// 		console.log('result', result);
-	// 		const message = result.response.JSON();
-	// 		console.log('message', message);
-	// 		setQuestions(message);
-	// 		// }
-	// 	};
-	// 	generateQuestions();
-	// }, []);
 	return (
 		<>
 			{/* Home page */}
@@ -199,12 +178,7 @@ However, usually there are 3 elements in a corrupt act:
 				<div>
 					<p className="p-2 underline font-bold text-center">Read Articles</p>
 				</div>
-				<button
-					onClick={() => navigate('/chat')}
-					className="absolute bottom-3 right-3 rounded-full p-2 bg-green-500 text-white text-3xl font-bold"
-				>
-					<IoChatbubbleEllipsesOutline />
-				</button>
+				<ChatBot className="absolute bottom-3 right-3" />
 			</div>
 			{/* // Article */}
 			<div className="flex flex-col justify-center  w-full md:w-3/4 mx-auto bg-white md:p-4 mt-2 min-h-[400px] md:min-h-[570px] h-auto">
