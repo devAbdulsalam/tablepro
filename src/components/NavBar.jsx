@@ -6,9 +6,9 @@ function NavBar() {
 
 	const links = [
 		{ name: 'Home', href: '/' },
-		{ name: 'Quiz', href: '/Quiz' },
-		{ name: 'Chat', href: '/chat' },
-		{ name: 'Ms Word', href: '/ms-word' },
+		// { name: 'Quiz', href: '/Quiz' },
+		// { name: 'Chat', href: '/chat' },
+		// { name: 'Ms Word', href: '/ms-word' },
 		{ name: 'Contact ', href: '/' },
 	];
 
@@ -18,7 +18,7 @@ function NavBar() {
 				<div>
 					<div className="flex items-center justify-between py-3 md:py-5 md:block">
 						<Link to="/">
-							<h2 className="text-2xl font-bold text-primary">Iforce</h2>
+							<h2 className="text-2xl font-bold text-primary">ISwap</h2>
 						</Link>
 						<div className="md:hidden">
 							<button

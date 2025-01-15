@@ -1,42 +1,78 @@
 /* eslint-disable no-undef */
 import { useState, useEffect } from 'react';
 import Select from './Select';
-const data = [
-	{ id: 1, name: 'Bitcoin', abv: 'BTC', value: 900 },
-	{ id: 2, name: 'Ethereum', abv: 'ETH', value: 800 },
-	{ id: 3, name: 'Tether', abv: 'USDT', value: 700 },
-	{ id: 4, name: 'Binance Coin', abv: 'BNB', value: 600 },
-	{ id: 5, name: 'USDT', abv: 'USDT', value: 500 },
-];
-function Form() {
+import axios from 'axios';
+
+function Form({ data }) {
 	const [getAmount, setGetAmount] = useState('');
 	const [sendAmount, setSendAmount] = useState('');
 	const [wallet, setWallet] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
-	const [selectedFrom, setSelectedFrom] = useState(data[0]);
-	const [selectToData, setSelectToData] = useState(data);
-	const [selectedTo, setSelectedTo] = useState(data[1]);
-	const [conversionRate, setConversionRate] = useState(1);
-	const apiUrl = import.meta.env.VITE_API_URL;
+	const [selectedFrom, setSelectedFrom] = useState(null);
+	const [selectToData, setSelectToData] = useState([]);
+	const [selectedTo, setSelectedTo] = useState([]);
+	const [conversionRate, setConversionRate] = useState(150);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			setLoading(true);
+			try {
+				axios.get(apiUrl, { mode: 'no-cors' }).then((response) => {
+					const newData = response.data.data;
+					console.log('crypo datas', newData);
+					setData(newData);
+				});
+				setLoading(false);
+				// const data = await response.json();
+			} catch (error) {
+				setLoading(false);
+				console.error('Error fetching data:', error);
+			}
+		};
+		fetchData();
+	}, [apiUrl]);
+	// Update conversion rate when `selectedFrom` or `selectedTo` changes
+	useEffect(() => {
+		if (selectedFrom && selectedTo) {
+			const fromRate = selectedFrom.value || 1;
+			const toRate = selectedTo.value || 1;
+			setConversionRate(toRate / fromRate);
+		}
+	}, [selectedFrom, selectedTo]);
+
+	// Auto-calculate the `getAmount` when `sendAmount` changes
+	useEffect(() => {
+		if (conversionRate && sendAmount) {
+			const calculatedAmount = (
+				parseFloat(sendAmount) * conversionRate
+			).toFixed(2);
+			setGetAmount(calculatedAmount);
+		}
+	}, [sendAmount, conversionRate]);
+
+	useEffect(() => {
+		const filteredData = data?.filter((item) => item.id !== selectedFrom?.id);
+		setSelectToData(filteredData || []);
+	}, [selectedFrom, data]);
 
 	const handleSubmit = async () => {
 		if (!wallet) {
-			setError('Please enter a tweet');
+			setError('Please enter a recipient wallet address');
 			return;
 		}
 		setLoading(true);
 		setError('');
 		try {
-			const response = await fetch(`${apiUrl}/tweets`, {
-				method: 'POST',
-				body: JSON.stringify({
-					text: text,
-					tweet_mode: 'extended',
-				}),
+			const response = await axios.post(`${apiUrl}/convert`, {
+				wallet,
+				sendAmount,
+				getAmount,
+				selectedFrom,
+				selectedTo,
 			});
-			const data = await response.json();
-			console.log(data);
+			const result = await response.json();
+			console.log(result);
 			setLoading(false);
 			setError('');
 		} catch (error) {
@@ -45,32 +81,13 @@ function Form() {
 			setError(error.message);
 		}
 	};
-	// // Update conversion rate based on selectedFrom and selectedTo
-	// useEffect(() => {
-	// 	if (selectedFrom && selectedTo) {
-	// 		const rate = selectedFrom.value / selectedTo.value;
-	// 		setConversionRate(rate);
-	// 	}
-	// }, [selectedFrom, selectedTo]);
-	// // Update getAmount dynamically when sendAmount changes
-	// useEffect(() => {
-	// 	if (sendAmount) {
-	// 		setGetAmount((parseFloat(sendAmount) * conversionRate).toFixed(2));
-	// 	}
-	// }, [sendAmount, conversionRate]);
-	// useEffect(() => {
-	// 	if (getAmount) {
-	// 		setSendAmount((parseFloat(getAmount) / conversionRate).toFixed(2));
-	// 	}
-	// }, [getAmount, conversionRate]);
 
-	useEffect(() => {
-		const filteredData = data.filter((item) => item.id !== selectedFrom.id);
-		setSelectToData(filteredData || []);
-	}, [selectedFrom]);
 	return (
 		<div className="flex justify-center py-10">
-			<div className=" rounded-xl bg-white text-left align-middle shadow-xl transition-all font-josefin min-w-[600px] max-w-2xl mx-auto">
+			<h2 className="text-center font-bold my-4">
+				Please fill in transaction details
+			</h2>
+			<div className="rounded-xl bg-slate-800/50 text-left align-middle shadow-xl transition-all font-josefin min-w-[600px] max-w-2xl mx-auto">
 				<div className="space-y-5 p-4">
 					<div>
 						<h2>Please fill in transaction details</h2>
@@ -81,12 +98,12 @@ function Form() {
 						</label>
 						<div className="flex items-center">
 							<input
-								type="text"
+								type="number"
 								id="sendAmount"
 								value={sendAmount}
 								placeholder="100"
 								onChange={(e) => setSendAmount(e.target.value)}
-								className="input p-2 rounded-md resize-none w-full border border-gray  text-black flex-1 mr-2"
+								className="input p-2 rounded-md resize-none w-full border border-gray text-black flex-1 mr-2"
 							/>
 							<div className="flex-1 mr-2 relative">
 								<Select
@@ -106,9 +123,9 @@ function Form() {
 								type="text"
 								id="getAmount"
 								value={getAmount}
-								placeholder="100"
-								onChange={(e) => setGetAmount(e.target.value)}
-								className="input p-2 rounded-md resize-none w-full border border-gray   text-black flex-1 mr-2"
+								disabled
+								placeholder="Calculated Amount"
+								className="input p-2 rounded-md resize-none w-full border border-gray text-black flex-1 mr-2"
 							/>
 							<div className="flex-1 mr-2 relative">
 								<Select
@@ -127,19 +144,18 @@ function Form() {
 							type="text"
 							id="wallet"
 							value={wallet}
-							placeholder="text"
+							placeholder="Wallet Address"
 							onChange={(e) => setWallet(e.target.value)}
-							className="input p-2 rounded-md resize-none w-full border border-gray mt-1  text-black"
+							className="input p-2 rounded-md resize-none w-full border border-gray mt-1 text-black"
 						/>
-						{/* <p>This is a placeholder for the recipient's wallet address</p> */}
 					</div>
 					{error && <p className="text-red-500">{error}</p>}
 					<button
 						disabled={loading}
-						className="bg-blue-500 hover:bg-blue-700 text-white font-semibold  py-3 w-full flex items-center justify-center rounded-md transition-all duration-500 ease-in-out"
+						className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-3 w-full flex items-center justify-center rounded-md transition-all duration-500 ease-in-out"
 						onClick={handleSubmit}
 					>
-						<span>{loading ? 'Getting Funds...' : 'Get Funds'}</span>
+						<span>{loading ? 'Processing...' : 'Submit Transaction'}</span>
 					</button>
 				</div>
 			</div>

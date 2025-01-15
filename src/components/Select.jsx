@@ -11,11 +11,10 @@ function debounce(fn, delay) {
 	return debounced;
 }
 
-function SelectField({ data, setSelectItem, selectItem }) {
+function SelectField({ data, setSelectItem }) {
 	const [query, setQuery] = useState('');
 	const [isOpen, setIsOpen] = useState(false);
 	const [filteredData, setFilteredData] = useState(data);
-
 	// Debounced Query Handler
 	const handleQuerySearch = useCallback(
 		debounce((value) => {
@@ -24,8 +23,10 @@ function SelectField({ data, setSelectItem, selectItem }) {
 				return;
 			}
 			console.log('search data', data);
-			const filtered = data.filter((item) =>
-				item.name.toLowerCase().includes(value.toLowerCase())
+			const filtered = data.filter(
+				(item) =>
+					item.name.toLowerCase().includes(value.toLowerCase()) ||
+					item.symbol.toLowerCase().includes(value.toLowerCase())
 			);
 			setFilteredData(filtered);
 		}, 500), // 500ms debounce time
@@ -64,7 +65,7 @@ function SelectField({ data, setSelectItem, selectItem }) {
 				onChange={handleInputChange}
 				onFocus={() => setIsOpen(true)}
 				onBlur={handleBlur}
-				placeholder={selectItem.name}
+				// placeholder={selectItem?.name}
 				className="w-full rounded-md border p-2 shadow-md"
 			/>
 			{isOpen && (
@@ -75,7 +76,6 @@ function SelectField({ data, setSelectItem, selectItem }) {
 				>
 					<div className="flex flex-col justify-start ">
 						{filteredData?.map((item) => {
-							// console.log('item', item);
 							return (
 								<button
 									key={item.id}
@@ -83,7 +83,7 @@ function SelectField({ data, setSelectItem, selectItem }) {
 									onClick={() => handleSelectItem(item)}
 									className="py-2 p-2 hover:bg-gray-100 cursor-pointer text-left"
 								>
-									{item.name}
+									{item?.symbol}
 								</button>
 							);
 						})}
